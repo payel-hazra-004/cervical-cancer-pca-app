@@ -18,7 +18,6 @@ st.set_page_config(page_title="Cervical Cancer Predictor")
 st.title("🧬 Cervical Cancer Prediction (PCA Model)")
 st.write("Enter patient details:")
 
-# Input fields
 # -------------------------------
 # User Inputs (Reduced & Manual)
 # -------------------------------
@@ -34,8 +33,6 @@ user_inputs["Hormonal Contraceptives"] = st.selectbox("Use hormonal contraceptiv
 user_inputs["IUD"] = st.selectbox("Use IUD?", ["Select", "No", "Yes"])
 user_inputs["STDs"] = st.selectbox("Any STD history?", ["Select", "No", "Yes"])
 user_inputs["HPV"] = st.selectbox("HPV infection?", ["Select", "No", "Yes"])
-
-input_array = np.array(input_data).reshape(1, -1)
 
 # -------------------------------
 # Prediction
@@ -59,8 +56,11 @@ if st.button("Predict"):
         st.error("Please enter valid numeric values")
         st.stop()
 
-    # Create full feature input
+    # -------------------------------
+    # Create input data (FIXED)
+    # -------------------------------
     input_data = []
+
     for feature in features:
         if feature in user_inputs:
             input_data.append(user_inputs[feature])
@@ -69,7 +69,9 @@ if st.button("Predict"):
 
     input_array = np.array(input_data).reshape(1, -1)
 
+    # -------------------------------
     # Prediction
+    # -------------------------------
     scaled = scaler.transform(input_array)
     pca_data = pca.transform(scaled)
 
