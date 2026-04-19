@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cervical Cancer Predictor</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --bg: #f8fafc;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); max-width: 500px; width: 100%; }
+        h2 { color: #1e293b; margin-bottom: 1.5rem; text-align: center; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; }
+        input, select { width: 100%; padding: 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 0.8rem; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 1rem; }
+        #result { margin-top: 1.5rem; padding: 1rem; border-radius: 6px; display: none; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🧬 Cancer Risk Predictor</h2>
+    <form id="predictForm">
+        <div class="form-group">
+            <label>Age</label>
+            <input type="number" name="Age" required>
+        </div>
+        <div class="form-group">
+            <label>Number of sexual partners</label>
+            <input type="number" name="Number of sexual partners" required>
+        </div>
+        <div class="form-group">
+            <label>Age at first intercourse</label>
+            <input type="number" name="First sexual intercourse" required>
+        </div>
+        <div class="form-group">
+            <label>Number of pregnancies</label>
+            <input type="number" name="Num of pregnancies" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Smokes</label>
+            <select name="Smokes">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+            </select>
+        </div>
+        <button type="submit">Analyze Risk</button>
+    </form>
+
+    <div id="result"></div>
+</div>
+
+<script>
+    document.getElementById('predictForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+        
+        const resDiv = document.getElementById('result');
+        resDiv.style.display = 'block';
+        resDiv.innerHTML = "Processing...";
+        resDiv.style.background = "#e2e8f0";
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            
+            if(result.risk === "High") {
+                resDiv.style.background = "#fee2e2";
+                resDiv.style.color = "#991b1b";
+                resDiv.innerHTML = `⚠️ High Risk (Prob: ${result.probability})`;
+            } else {
+                resDiv.style.background = "#dcfce7";
+                resDiv.style.color = "#166534";
+                resDiv.innerHTML = `✅ Low Risk (Prob: ${result.probability})`;
+            }
+        } catch (err) {
+            resDiv.innerHTML = "Error processing request.";
+        }
+    };
+</script>
+
+</body>
+</html>
